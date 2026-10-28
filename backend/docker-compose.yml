@@ -3,11 +3,11 @@ services:
     image: postgres:17-alpine
     container_name: tracker-postgres
     environment:
-      POSTGRES_DB: ${DB_NAME:-tracker}
-      POSTGRES_USER: ${DB_USERNAME:-tracker}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-tracker}
+      POSTGRES_DB: ${DB_NAME:?DB_NAME must be set in backend/.env}
+      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME must be set in backend/.env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in backend/.env}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT:?DB_PORT must be set in backend/.env}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
