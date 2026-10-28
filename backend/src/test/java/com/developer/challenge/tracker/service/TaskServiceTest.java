@@ -21,7 +21,6 @@ import org.springframework.data.domain.Sort;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
 
-	private static final UUID TASK_ID = UUID.randomUUID();
+	private static final Long TASK_ID = 42L;
 	private static final OffsetDateTime DUE_DATE = OffsetDateTime.parse("2030-01-15T10:00:00Z");
 
 	@Mock
@@ -43,29 +42,27 @@ class TaskServiceTest {
 	private TaskService taskService;
 
 	@Test
-	void createTask_savesTaskAndReturnsId() {
+	void createTask_savesTaskWithCreatedStatusAndReturnsId() {
 		stubSaveAssigningId();
 
-		UUID id = taskService.createTask(
-				new CreateTaskRequest("  Review bundle  ", "Check evidence", TaskStatus.INPROGRESS, DUE_DATE));
+		Long id = taskService.createTask(new CreateTaskRequest("  Review bundle  ", "Check evidence", DUE_DATE));
 
 		assertThat(id).isEqualTo(TASK_ID);
 
 		Task saved = capturedSavedTask();
 		assertThat(saved.getTitle()).isEqualTo("Review bundle");
 		assertThat(saved.getDescription()).isEqualTo("Check evidence");
-		assertThat(saved.getStatus()).isEqualTo(TaskStatus.INPROGRESS);
+		assertThat(saved.getStatus()).isEqualTo(TaskStatus.CREATED);
 		assertThat(saved.getDueDate()).isEqualTo(DUE_DATE);
 	}
 
 	@Test
-	void createTask_defaultsStatusToCreatedWhenOmitted() {
+	void createTask_allowsMissingDescription() {
 		stubSaveAssigningId();
 
-		taskService.createTask(new CreateTaskRequest("Review bundle", null, null, DUE_DATE));
+		taskService.createTask(new CreateTaskRequest("Review bundle", null, DUE_DATE));
 
 		Task saved = capturedSavedTask();
-		assertThat(saved.getStatus()).isEqualTo(TaskStatus.CREATED);
 		assertThat(saved.getDescription()).isNull();
 	}
 

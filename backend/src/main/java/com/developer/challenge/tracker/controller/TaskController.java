@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -41,7 +40,7 @@ public class TaskController {
 	private final TaskService taskService;
 
 	@PostMapping
-	@Operation(summary = "Create a task")
+	@Operation(summary = "Create a task", description = "New tasks always start with status CREATED")
 	@ApiResponse(responseCode = "201", description = "Task created; returns the new task's id")
 	@ApiResponse(responseCode = "400", description = "Invalid request",
 			content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
@@ -56,7 +55,7 @@ public class TaskController {
 			content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
 	@ApiResponse(responseCode = "404", description = "Task not found",
 			content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-	public ResponseEntity<TaskResponse> getTask(@PathVariable UUID id) {
+	public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
 		return ResponseEntity.ok(taskService.getTask(id));
 	}
 
@@ -86,7 +85,7 @@ public class TaskController {
 			content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
 	@ApiResponse(responseCode = "404", description = "Task not found",
 			content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-	public ResponseEntity<TaskResponse> updateStatus(@PathVariable UUID id,
+	public ResponseEntity<TaskResponse> updateStatus(@PathVariable Long id,
 			@Valid @RequestBody UpdateTaskStatusRequest request) {
 		return ResponseEntity.ok(taskService.updateStatus(id, request.status()));
 	}
@@ -96,7 +95,7 @@ public class TaskController {
 	@ApiResponse(responseCode = "204", description = "Task deleted")
 	@ApiResponse(responseCode = "404", description = "Task not found",
 			content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
-	public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
+	public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
 		taskService.deleteTask(id);
 		return ResponseEntity.noContent().build();
 	}

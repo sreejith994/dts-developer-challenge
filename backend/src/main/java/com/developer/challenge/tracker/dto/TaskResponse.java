@@ -5,11 +5,10 @@ import com.developer.challenge.tracker.domain.TaskStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Schema(description = "A caseworker task")
 public record TaskResponse(
-		UUID id,
+		Long id,
 		String title,
 		String description,
 		TaskStatus status,

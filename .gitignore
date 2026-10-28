@@ -65,3 +65,6 @@ coverage/
 *.trace.db
 *.sqlite
 *.sqlite3
+
+# TypeScript incremental build info
+*.tsbuildinfo

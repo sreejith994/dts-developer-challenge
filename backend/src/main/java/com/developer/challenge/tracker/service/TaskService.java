@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -27,20 +26,20 @@ public class TaskService {
 
 	private final TaskRepository taskRepository;
 
-	public UUID createTask(CreateTaskRequest request) {
+	public Long createTask(CreateTaskRequest request) {
 		Task task = Task.builder()
 				.title(request.title().strip())
 				.description(request.description())
-				.status(request.status() != null ? request.status() : TaskStatus.CREATED)
+				.status(TaskStatus.CREATED)
 				.dueDate(request.dueDate())
 				.build();
 
-		UUID id = taskRepository.save(task).getId();
+		Long id = taskRepository.save(task).getId();
 		log.info("Created task {}", id);
 		return id;
 	}
 
-	public TaskResponse getTask(UUID id) {
+	public TaskResponse getTask(Long id) {
 		return TaskResponse.from(findTask(id));
 	}
 
@@ -56,7 +55,7 @@ public class TaskService {
 				.toList();
 	}
 
-	public TaskResponse updateStatus(UUID id, TaskStatus status) {
+	public TaskResponse updateStatus(Long id, TaskStatus status) {
 		Task task = findTask(id);
 		task.setStatus(status);
 		Task saved = taskRepository.saveAndFlush(task);
@@ -64,13 +63,13 @@ public class TaskService {
 		return TaskResponse.from(saved);
 	}
 
-	public void deleteTask(UUID id) {
+	public void deleteTask(Long id) {
 		Task task = findTask(id);
 		taskRepository.delete(task);
 		log.info("Deleted task {}", id);
 	}
 
-	private Task findTask(UUID id) {
+	private Task findTask(Long id) {
 		return taskRepository.findById(id)
 				.orElseThrow(() -> new TaskNotFoundException(id));
 	}

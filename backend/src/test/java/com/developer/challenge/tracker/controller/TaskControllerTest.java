@@ -19,7 +19,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -36,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
 
-	private static final UUID TASK_ID = UUID.fromString("3f1c2b7e-8a4d-4c6e-9b2a-1d5e7f9a0c3b");
+	private static final Long TASK_ID = 42L;
 	private static final OffsetDateTime DUE_DATE = OffsetDateTime.now(ZoneOffset.UTC).plusYears(1).truncatedTo(ChronoUnit.SECONDS);
 
 	@Autowired
@@ -55,7 +54,7 @@ class TaskControllerTest {
 								{"title": "Review bundle", "description": "Check evidence", "dueDate": "%s"}
 								""".formatted(DUE_DATE)))
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id").value(TASK_ID.toString()));
+				.andExpect(jsonPath("$.id").value(TASK_ID));
 	}
 
 	@Test
@@ -85,25 +84,12 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void createTask_returns400WhenStatusUnknown() throws Exception {
-		mockMvc.perform(post("/api/tasks")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{"title": "Review bundle", "status": "DONE", "dueDate": "%s"}
-								""".formatted(DUE_DATE)))
-				.andExpect(status().isBadRequest())
-				.andExpect(jsonPath("$.title").value("Malformed request"));
-
-		verifyNoInteractions(taskService);
-	}
-
-	@Test
 	void getTask_returnsTask() throws Exception {
 		when(taskService.getTask(TASK_ID)).thenReturn(response(TaskStatus.BLOCKED));
 
 		mockMvc.perform(get("/api/tasks/{id}", TASK_ID))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(TASK_ID.toString()))
+				.andExpect(jsonPath("$.id").value(TASK_ID))
 				.andExpect(jsonPath("$.status").value("BLOCKED"));
 	}
 
@@ -118,8 +104,8 @@ class TaskControllerTest {
 	}
 
 	@Test
-	void getTask_returns400WhenIdIsNotUuid() throws Exception {
-		mockMvc.perform(get("/api/tasks/{id}", "not-a-uuid"))
+	void getTask_returns400WhenIdIsNotANumber() throws Exception {
+		mockMvc.perform(get("/api/tasks/{id}", "abc"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.title").value("Invalid parameter"));
 	}
@@ -132,7 +118,7 @@ class TaskControllerTest {
 		mockMvc.perform(get("/api/tasks").param("page", "1").param("size", "5"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.content.length()").value(1))
-				.andExpect(jsonPath("$.content[0].id").value(TASK_ID.toString()))
+				.andExpect(jsonPath("$.content[0].id").value(TASK_ID))
 				.andExpect(jsonPath("$.page").value(1))
 				.andExpect(jsonPath("$.size").value(5))
 				.andExpect(jsonPath("$.totalElements").value(6))
@@ -167,7 +153,7 @@ class TaskControllerTest {
 		mockMvc.perform(get("/api/tasks/all"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.length()").value(1))
-				.andExpect(jsonPath("$[0].id").value(TASK_ID.toString()));
+				.andExpect(jsonPath("$[0].id").value(TASK_ID));
 	}
 
 	@Test

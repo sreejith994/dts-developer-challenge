@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,7 +53,7 @@ class TaskApiIntegrationTest {
 				.returnResult().getResponseBody();
 
 		assertThat(created).isNotNull();
-		UUID id = created.id();
+		Long id = created.id();
 
 		client.get().uri("/api/tasks/{id}", id)
 				.exchange()
@@ -85,6 +84,23 @@ class TaskApiIntegrationTest {
 		client.get().uri("/api/tasks/{id}", id)
 				.exchange()
 				.expectStatus().isNotFound();
+	}
+
+	@Test
+	void createTask_ignoresStatusInRequestAndStartsAsCreated() {
+		CreateTaskResponse created = client.post().uri("/api/tasks")
+				.contentType(MediaType.APPLICATION_JSON)
+				.body("""
+						{"title": "Review bundle", "status": "COMPLETED", "dueDate": "%s"}
+						""".formatted(NOW.plusDays(1)))
+				.exchange()
+				.expectStatus().isCreated()
+				.expectBody(CreateTaskResponse.class)
+				.returnResult().getResponseBody();
+
+		assertThat(created).isNotNull();
+		assertThat(taskRepository.findById(created.id())).get()
+				.extracting("status").isEqualTo(TaskStatus.CREATED);
 	}
 
 	@Test
@@ -149,7 +165,7 @@ class TaskApiIntegrationTest {
 
 	@Test
 	void operationsOnUnknownTask_returnNotFound() {
-		UUID unknownId = UUID.randomUUID();
+		Long unknownId = Long.MAX_VALUE;
 
 		client.get().uri("/api/tasks/{id}", unknownId)
 				.exchange()
