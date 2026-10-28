@@ -1,0 +1,67 @@
+# IDEs and editors
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Eclipse / STS / NetBeans
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Java / Spring Boot (backend)
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+bin/
+HELP.md
+
+# React / Node (frontend)
+node_modules/
+dist/
+dist-ssr/
+coverage/
+.eslintcache
+*.local
+.npm/
+.cache/
+
+# Local databases (e.g. H2 file DB)
+*.db
+*.mv.db
+*.trace.db
+*.sqlite
+*.sqlite3
